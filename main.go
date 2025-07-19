@@ -23,7 +23,7 @@ func main() {
 	helpFlag := flag.Bool("help", false, "Show usage information")
 
 	flag.Usage = func() {
-		fmt.Fprintf(flag.CommandLine.Output(), `Usage:
+		_, _ = fmt.Fprintf(flag.CommandLine.Output(), `Usage:
   ifacegen [flags] <package pattern>
 
 Example:
