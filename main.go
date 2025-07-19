@@ -81,11 +81,12 @@ Flags:
 				}
 				return
 			}
-			if err := writeIfChanged(outFile, code); err != nil {
+			if wrote, err := writeIfChanged(outFile, code); err != nil {
 				log.Printf("Error writing file %s: %v", outFile, err)
 				return
+			} else if wrote {
+				log.Printf("Generated interfaces for package %s", pkg.PkgPath)
 			}
-			log.Printf("Generated interfaces for package %s", pkg.PkgPath)
 		}(pkg)
 	}
 	wg.Wait()
@@ -102,10 +103,10 @@ func splitMatches(s string) []string {
 	return res
 }
 
-func writeIfChanged(path string, content []byte) error {
+func writeIfChanged(path string, content []byte) (bool, error) {
 	existing, err := os.ReadFile(path)
 	if err == nil && bytes.Equal(existing, content) {
-		return nil
+		return false, nil
 	}
-	return os.WriteFile(path, content, 0644)
+	return true, os.WriteFile(path, content, 0644)
 }
