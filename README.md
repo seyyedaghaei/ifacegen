@@ -48,7 +48,7 @@ type AuthService struct {
 
 ```go
 // ifacegen:skip
-func (s *UserService) internalLogic() {}
+func (s *UserService) InternalLogic() {}
 ```
 
 You can **explicitly include** structs (even if they don't match `-match`) with the `// ifacegen:generate` comment:
