@@ -111,7 +111,7 @@ func (d *packageData) processPackage(name string, matches []string) error {
 		})
 		if len(methods) > 0 {
 			d.Interfaces = append(d.Interfaces, interfaceInfo{
-				Name:    strings.ReplaceAll(name, "{}", structName),
+				Name:    strings.ReplaceAll(name, "{}", export(structName)),
 				Comment: includedStructs[structName],
 				Methods: methods,
 			})
