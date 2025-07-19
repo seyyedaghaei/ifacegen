@@ -110,9 +110,8 @@ func (d *packageData) processPackage(name string, matches []string) error {
 			return methods[i].Signature < methods[j].Signature
 		})
 		if len(methods) > 0 {
-			ifaceName := "I" + export(structName)
 			d.Interfaces = append(d.Interfaces, interfaceInfo{
-				Name:    strings.ReplaceAll(name, "{}", ifaceName),
+				Name:    strings.ReplaceAll(name, "{}", structName),
 				Comment: includedStructs[structName],
 				Methods: methods,
 			})
