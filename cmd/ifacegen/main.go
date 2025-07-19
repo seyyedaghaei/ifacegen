@@ -47,6 +47,11 @@ Flags:
 	}
 
 	pkgs := loader.LoadPackages(flag.Args()...)
+
+	if len(pkgs) == 0 {
+		log.Fatalln("Warning: no packages matched the given pattern(s)")
+	}
+
 	matches := splitMatches(*matchFlag)
 
 	sem := make(chan struct{}, runtime.NumCPU())
@@ -54,7 +59,6 @@ Flags:
 
 	for _, pkg := range pkgs {
 		wg.Add(1)
-		pkg := pkg
 		go func(pkg *packages.Package) {
 			defer wg.Done()
 			sem <- struct{}{}

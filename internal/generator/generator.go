@@ -2,7 +2,12 @@ package generator
 
 import (
 	"bytes"
+	"go/ast"
+	"go/token"
+	"go/types"
 	"golang.org/x/tools/go/packages"
+	"sort"
+	"strings"
 	"text/template"
 )
 
@@ -58,14 +63,71 @@ func Generate(pkg *packages.Package, name string, matches []string) ([]byte, err
 		Package:    pkg.Name,
 	}
 
-	if err := data.processPackage(name); err != nil {
+	if err := data.processPackage(name, matches); err != nil {
 		return nil, err
 	}
 
 	return data.render()
 }
 
-func (d *packageData) processPackage(name string) error {
+func (d *packageData) processPackage(name string, matches []string) error {
+	// First, scan AST to find structs to include based on tags or naming
+	includedStructs := map[string]string{}
+	for _, f := range d.pkg.Syntax {
+		for _, decl := range f.Decls {
+			gen, ok := decl.(*ast.GenDecl)
+			if !ok || gen.Tok != token.TYPE {
+				continue
+			}
+			for _, spec := range gen.Specs {
+				ts, ok := spec.(*ast.TypeSpec)
+				if !ok || ts.Name == nil {
+					continue
+				}
+				if d.shouldIncludeStruct(ts.Name.Name, matches, gen.Doc) {
+					includedStructs[ts.Name.Name] = extractCommentFromDoc(gen.Doc)
+				}
+			}
+		}
+	}
+
+	// Then collect the *types.TypeName from the package scope that match includedStructs
+	structs := map[string]*types.TypeName{}
+	scope := d.pkg.Types.Scope()
+	for _, name := range scope.Names() {
+		if _, ok := includedStructs[name]; !ok {
+			continue
+		}
+		if tn, ok := scope.Lookup(name).(*types.TypeName); ok {
+			structs[name] = tn
+		}
+	}
+
+	// For each struct, collect methods and generate interface info
+	for structName, typeName := range structs {
+		methods := d.collectMethods(d.pkg.Syntax, d.pkg.TypesInfo, typeName.Type())
+		sort.SliceStable(methods, func(i, j int) bool {
+			return methods[i].Signature < methods[j].Signature
+		})
+		if len(methods) > 0 {
+			ifaceName := "I" + export(structName)
+			d.Interfaces = append(d.Interfaces, interfaceInfo{
+				Name:    strings.ReplaceAll(name, "{}", ifaceName),
+				Comment: includedStructs[structName],
+				Methods: methods,
+			})
+		}
+	}
+
+	sort.SliceStable(d.Interfaces, func(i, j int) bool {
+		return d.Interfaces[i].Name < d.Interfaces[j].Name
+	})
+
+	sort.SliceStable(d.Imports, func(i, j int) bool {
+		a, b := strings.Split(d.Imports[i], "\"")[1], strings.Split(d.Imports[j], "\"")[1]
+		return a < b
+	})
+
 	return nil
 }
 

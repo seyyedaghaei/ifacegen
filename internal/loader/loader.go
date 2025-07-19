@@ -1,7 +1,6 @@
 package loader
 
 import (
-	"fmt"
 	"log"
 
 	"golang.org/x/tools/go/packages"
@@ -17,13 +16,13 @@ func LoadPackages(patterns ...string) []*packages.Package {
 		log.Fatalf("failed to load packages: %v", err)
 	}
 
-	if len(pkgs) == 0 {
-		log.Println("Warning: no packages matched the given pattern(s)")
-	}
+	var pkgsWithFile []*packages.Package
 
 	for _, pkg := range pkgs {
-		fmt.Printf("Loaded package: %s, GoFiles: %d\n", pkg.Name, len(pkg.GoFiles))
+		if len(pkg.GoFiles) > 0 {
+			pkgsWithFile = append(pkgsWithFile, pkg)
+		}
 	}
 
-	return pkgs
+	return pkgsWithFile
 }
