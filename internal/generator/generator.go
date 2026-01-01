@@ -3,6 +3,7 @@ package generator
 import (
 	"bytes"
 	"go/ast"
+	"go/format"
 	"go/token"
 	"go/types"
 	"golang.org/x/tools/go/packages"
@@ -55,6 +56,8 @@ type packageData struct {
 	Interfaces []interfaceInfo
 }
 
+// Generate creates interface definitions for the given package based on struct methods.
+// It returns the generated Go code as bytes, or nil if no interfaces should be generated.
 func Generate(pkg *packages.Package, name string, matches []string) ([]byte, error) {
 	data := &packageData{
 		pkg:        pkg,
@@ -141,5 +144,5 @@ func (d *packageData) render() ([]byte, error) {
 		return nil, err
 	}
 
-	return buf.Bytes(), nil
+	return format.Source(buf.Bytes())
 }

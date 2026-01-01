@@ -36,6 +36,10 @@ func (d *packageData) typeString(t types.Type) string {
 		if pkg != nil && pkg.Name() != "" && pkg.Name() != "main" {
 			pkgPath := pkg.Path()
 
+			if pkgPath == d.pkg.PkgPath {
+				return obj.Name()
+			}
+
 			if _, ok := d.pkgImps[pkgPath]; !ok {
 				name := pkg.Name()
 				d.pkgCounter[name]++
