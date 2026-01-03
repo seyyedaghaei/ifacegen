@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"golang.org/x/tools/go/packages"
 	"log"
 	"os"
 	"path/filepath"
@@ -12,6 +11,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"golang.org/x/tools/go/packages"
 
 	"github.com/seyyedaghaei/ifacegen/internal/cli"
 	"github.com/seyyedaghaei/ifacegen/internal/generator"
@@ -75,7 +76,6 @@ Flags:
 
 		fmt.Printf("\n🚀 Generated command: %s\n\n", config.GenerateCommand())
 
-		// Use the interactive config
 		if config.Watch {
 			runWatchMode([]string{"./..."}, strings.Join(config.MatchPatterns, ","), config.OutputFile, config.NamePattern, config.DryRun, config.Verbose, config.Progress)
 		} else {
@@ -119,7 +119,6 @@ func runGeneration(patterns []string, matchFlag, outputFlag, nameFlag string, dr
 		fmt.Println(strings.Repeat("=", 50))
 	}
 
-	// Use a semaphore to limit concurrent processing
 	maxWorkers := runtime.NumCPU()
 	if len(pkgs) < maxWorkers {
 		maxWorkers = len(pkgs)
@@ -166,7 +165,6 @@ func runGeneration(patterns []string, matchFlag, outputFlag, nameFlag string, dr
 				if progress {
 					fmt.Printf("📦 [%d/%d] Package: %s\n", processedCount, len(pkgs), pkg.PkgPath)
 
-					// Generate and display diff
 					diffResult := generator.GenerateDiff(outFile, code)
 					if diffResult.HasDiff {
 						fmt.Print(generator.FormatDiffResult(diffResult))
@@ -222,9 +220,6 @@ func runWatchMode(patterns []string, matchFlag, outputFlag, nameFlag string, dry
 	for {
 		select {
 		case <-ticker.C:
-			// Simple, reliable behavior: if user asked for ./... (most common),
-			// detect changes by scanning the working directory for .go files.
-			// For other patterns, regenerate periodically to avoid missing changes.
 			hasChanges, newest := goFilesChangedSince(patterns, lastRun)
 			if hasChanges {
 				fmt.Println("\n🔄 Changes detected, regenerating...")
@@ -251,8 +246,6 @@ func goFilesChangedSince(patterns []string, since time.Time) (bool, time.Time) {
 		}
 	}
 
-	// If we can't confidently map patterns to directories, don't lie—just return false.
-	// Fall back to regenerating every tick (better than silently doing nothing).
 	if !shouldScanCwd {
 		return true, time.Now()
 	}

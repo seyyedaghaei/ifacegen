@@ -17,7 +17,7 @@
 ## Installation
 
 ```bash
-go install github.com/seyyedaghaei/ifacegen@latest
+go install github.com/seyyedaghaei/ifacegen/cmd/ifacegen@latest
 ```
 
 ## Usage

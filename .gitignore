@@ -1,7 +1,7 @@
 .idea
 
 # Binary files
-ifacegen
+/ifacegen
 *.exe
 *.exe~
 *.dll
