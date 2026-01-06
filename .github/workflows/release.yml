@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build binaries (single job)
+        env:
+          CGO_ENABLED: "0"
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+
+          VERSION="${GITHUB_REF_NAME:-dev}"
+          PKG="./cmd/ifacegen"
+
+          build_one() {
+            local goos="$1"
+            local goarch="$2"
+            local out="dist/ifacegen-${goos}-${goarch}"
+            local ext=""
+            if [ "$goos" = "windows" ]; then
+              ext=".exe"
+            fi
+
+            echo "Building ${goos}/${goarch}..."
+            GOOS="$goos" GOARCH="$goarch" go build -trimpath -ldflags "-s -w -X main.version=${VERSION}" -o "${out}${ext}" "${PKG}"
+          }
+
+          build_one linux amd64
+          build_one linux arm64
+          build_one darwin amd64
+          build_one darwin arm64
+          build_one windows amd64
+          build_one windows 386
+
+          (cd dist && sha256sum * > sha256sums.txt)
+
+      - name: Create GitHub release (and upload artifacts)
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/*
+
