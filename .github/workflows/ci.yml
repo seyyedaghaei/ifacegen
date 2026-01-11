@@ -37,6 +37,6 @@ jobs:
         uses: golangci/golangci-lint-action@v7
         with:
           # Pin to a release built with Go >= 1.26 (required for go 1.26 modules).
-          version: 2.11.3
+          version: v2.11.3
           args: --timeout=5m
 
