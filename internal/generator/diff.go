@@ -71,7 +71,7 @@ func generateCreatePreview(content []byte) string {
 	var preview strings.Builder
 	preview.WriteString("📄 New file will be created:\n")
 	for _, line := range lines {
-		preview.WriteString(fmt.Sprintf("+ %s\n", line))
+		_, _ = fmt.Fprintf(&preview, "+ %s\n", line)
 	}
 	return preview.String()
 }
@@ -90,11 +90,16 @@ func generateUpdatePreview(oldContent, newContent []byte) string {
 	}
 
 	for _, line := range previewLines {
-		preview.WriteString(fmt.Sprintf("  %s\n", line))
+		_, _ = fmt.Fprintf(&preview, "  %s\n", line)
 	}
 
-	preview.WriteString(fmt.Sprintf("\n📊 Size change: %d → %d bytes (%+d)\n",
-		len(oldContent), len(newContent), len(newContent)-len(oldContent)))
+	_, _ = fmt.Fprintf(
+		&preview,
+		"\n📊 Size change: %d → %d bytes (%+d)\n",
+		len(oldContent),
+		len(newContent),
+		len(newContent)-len(oldContent),
+	)
 
 	return preview.String()
 }
@@ -109,7 +114,7 @@ func generateOverwritePreview(content []byte) string {
 	var preview strings.Builder
 	preview.WriteString("⚠️  Existing file will be overwritten:\n")
 	for _, line := range lines {
-		preview.WriteString(fmt.Sprintf("  %s\n", line))
+		_, _ = fmt.Fprintf(&preview, "  %s\n", line)
 	}
 	return preview.String()
 }
@@ -121,7 +126,7 @@ func FormatDiffResult(result DiffResult) string {
 	}
 
 	var output strings.Builder
-	output.WriteString(fmt.Sprintf("📦 %s\n", result.File))
+	_, _ = fmt.Fprintf(&output, "📦 %s\n", result.File)
 
 	switch result.Action {
 	case "create":

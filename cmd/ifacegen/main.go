@@ -46,7 +46,7 @@ Example:
 Flags:
 `)
 		flag.PrintDefaults()
-		fmt.Fprintf(flag.CommandLine.Output(), "\nVersion: %s\n", version)
+		_, _ = fmt.Fprintf(flag.CommandLine.Output(), "\nVersion: %s\n", version)
 	}
 
 	flag.Parse()
@@ -217,23 +217,20 @@ func runWatchMode(patterns []string, matchFlag, outputFlag, nameFlag string, dry
 
 	lastRun := time.Now()
 
-	for {
-		select {
-		case <-ticker.C:
-			hasChanges, newest := goFilesChangedSince(patterns, lastRun)
-			if hasChanges {
-				fmt.Println("\n🔄 Changes detected, regenerating...")
-			} else if verbose {
-				log.Printf("No changes detected; skipping regeneration")
-				continue
-			} else {
-				continue
-			}
-
-			runGeneration(patterns, matchFlag, outputFlag, nameFlag, dryRun, verbose, progress)
-			lastRun = newest
-			fmt.Println("👀 Watching for changes...")
+	for range ticker.C {
+		hasChanges, newest := goFilesChangedSince(patterns, lastRun)
+		if hasChanges {
+			fmt.Println("\n🔄 Changes detected, regenerating...")
+		} else if verbose {
+			log.Printf("No changes detected; skipping regeneration")
+			continue
+		} else {
+			continue
 		}
+
+		runGeneration(patterns, matchFlag, outputFlag, nameFlag, dryRun, verbose, progress)
+		lastRun = newest
+		fmt.Println("👀 Watching for changes...")
 	}
 }
 
