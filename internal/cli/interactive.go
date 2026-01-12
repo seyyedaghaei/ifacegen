@@ -141,31 +141,31 @@ func (c *InteractiveConfig) GenerateCommand() string {
 	parts = append(parts, "ifacegen")
 
 	if len(c.MatchPatterns) > 0 {
-		parts = append(parts, "-match", strings.Join(c.MatchPatterns, ","))
+		parts = append(parts, "--match", strings.Join(c.MatchPatterns, ","))
 	}
 
 	if c.OutputFile != "iface_gen.go" {
-		parts = append(parts, "-output", c.OutputFile)
+		parts = append(parts, "--output", c.OutputFile)
 	}
 
 	if c.NamePattern != "I{}" {
-		parts = append(parts, "-name", c.NamePattern)
+		parts = append(parts, "--name", c.NamePattern)
 	}
 
 	if c.DryRun {
-		parts = append(parts, "-dry-run")
+		parts = append(parts, "--dry-run")
 	}
 
 	if c.Verbose {
-		parts = append(parts, "-verbose")
+		parts = append(parts, "--verbose")
 	}
 
 	if c.Watch {
-		parts = append(parts, "-watch")
+		parts = append(parts, "--watch")
 	}
 
 	if !c.Progress {
-		parts = append(parts, "-progress=false")
+		parts = append(parts, "--progress=false")
 	}
 
 	parts = append(parts, "./...")

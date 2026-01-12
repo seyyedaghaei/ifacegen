@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -12,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/spf13/pflag"
 	"golang.org/x/tools/go/packages"
 
 	"github.com/seyyedaghaei/ifacegen/internal/cli"
@@ -22,37 +22,37 @@ import (
 var version = "dev"
 
 func main() {
-	matchFlag := flag.String("match", "", "Comma-separated glob patterns to match struct names (e.g. *Service)")
-	outputFlag := flag.String("output", "iface_gen.go", "Name of the generated interface file")
-	nameFlag := flag.String("name", "I{}", "Naming pattern for interfaces. '{}' replaced by struct name")
-	versionFlag := flag.Bool("version", false, "Show version information")
-	helpFlag := flag.Bool("help", false, "Show usage information")
-	dryRunFlag := flag.Bool("dry-run", false, "Show what would be generated without writing files")
-	verboseFlag := flag.Bool("verbose", false, "Enable verbose output")
-	watchFlag := flag.Bool("watch", false, "Watch for file changes and regenerate automatically")
-	progressFlag := flag.Bool("progress", true, "Show progress indicators (default: true)")
-	interactiveFlag := flag.Bool("interactive", false, "Start interactive configuration mode")
+	matchFlag := pflag.StringP("match", "m", "", "Comma-separated glob patterns to match struct names (e.g. *Service)")
+	outputFlag := pflag.StringP("output", "o", "iface_gen.go", "Name of the generated interface file")
+	nameFlag := pflag.StringP("name", "n", "I{}", "Naming pattern for interfaces. '{}' replaced by struct name")
+	versionFlag := pflag.BoolP("version", "v", false, "Show version information")
+	helpFlag := pflag.BoolP("help", "h", false, "Show usage information")
+	dryRunFlag := pflag.BoolP("dry-run", "d", false, "Show what would be generated without writing files")
+	verboseFlag := pflag.BoolP("verbose", "V", false, "Enable verbose output")
+	watchFlag := pflag.BoolP("watch", "w", false, "Watch for file changes and regenerate automatically")
+	progressFlag := pflag.BoolP("progress", "p", true, "Show progress indicators (default: true)")
+	interactiveFlag := pflag.BoolP("interactive", "i", false, "Start interactive configuration mode")
 
-	flag.Usage = func() {
-		_, _ = fmt.Fprintf(flag.CommandLine.Output(), `Usage:
+	pflag.Usage = func() {
+		_, _ = fmt.Fprintf(pflag.CommandLine.Output(), `Usage:
   ifacegen [flags] <package pattern>
 
 Example:
-  ifacegen -match=*Service,*Repository ./...
-  ifacegen -dry-run -match=*Service ./...
-  ifacegen -watch -match=*Service ./...
-  ifacegen -interactive
+  ifacegen --match=*Service,*Repository ./...
+  ifacegen --dry-run --match=*Service ./...
+  ifacegen --watch --match=*Service ./...
+  ifacegen --interactive
 
 Flags:
 `)
-		flag.PrintDefaults()
-		_, _ = fmt.Fprintf(flag.CommandLine.Output(), "\nVersion: %s\n", version)
+		pflag.PrintDefaults()
+		_, _ = fmt.Fprintf(pflag.CommandLine.Output(), "\nVersion: %s\n", version)
 	}
 
-	flag.Parse()
+	pflag.Parse()
 
 	if *helpFlag {
-		flag.Usage()
+		pflag.Usage()
 		os.Exit(0)
 	}
 
@@ -84,7 +84,7 @@ Flags:
 		return
 	}
 
-	patterns := flag.Args()
+	patterns := pflag.Args()
 	if len(patterns) == 0 {
 		patterns = []string{"./..."}
 	}

@@ -24,44 +24,44 @@ go install github.com/seyyedaghaei/ifacegen/cmd/ifacegen@latest
 
 ### Basic Usage
 ```bash
-ifacegen -match '*Service,*Repository' -output iface_gen.go ./...
+ifacegen --match '*Service,*Repository' --output iface_gen.go ./...
 ```
 
 ### Interactive Mode
 For easy configuration, use interactive mode:
 ```bash
-ifacegen -interactive
+ifacegen --interactive
 ```
 
 ### Advanced Examples
 ```bash
 # Dry run to see what would be generated
-ifacegen -dry-run -match '*Service' ./...
+ifacegen --dry-run --match '*Service' ./...
 
 # Watch mode for development
-ifacegen -watch -match '*Service' ./...
+ifacegen --watch --match '*Service' ./...
 
 # Verbose output with progress indicators
-ifacegen -verbose -match '*Service,*Repository' ./...
+ifacegen --verbose --match '*Service,*Repository' ./...
 
 # Custom interface naming
-ifacegen -name '{}Interface' -match '*Service' ./...
+ifacegen --name '{}Interface' --match '*Service' ./...
 ```
 
 ### Flags
 
 | Flag           | Description                                                                 |
 |----------------|-----------------------------------------------------------------------------|
-| `-match`       | Comma-separated list of glob patterns to match struct names (e.g., `*Service`). |
-| `-output`      | Output filename used inside each package (default: `iface_gen.go`).         |
-| `-name`        | Pattern for naming interfaces, using `{}` as the placeholder (default: `I{}`). |
-| `-dry-run`     | Show what would be generated without writing files.                         |
-| `-verbose`     | Enable verbose output with detailed logging.                                |
-| `-watch`       | Watch for file changes and regenerate automatically.                        |
-| `-progress`    | Show progress indicators (default: true).                                  |
-| `-interactive` | Start interactive configuration mode.                                       |
-| `-version`     | Show version information.                                                   |
-| `-help`        | Show usage information.                                                     |
+| `--match`, `-m`       | Comma-separated list of glob patterns to match struct names (e.g., `*Service`). |
+| `--output`, `-o`      | Output filename used inside each package (default: `iface_gen.go`).         |
+| `--name`, `-n`        | Pattern for naming interfaces, using `{}` as the placeholder (default: `I{}`). |
+| `--dry-run`, `-d`     | Show what would be generated without writing files.                         |
+| `--verbose`, `-V`     | Enable verbose output with detailed logging.                                |
+| `--watch`, `-w`       | Watch for file changes and regenerate automatically.                        |
+| `--progress`, `-p`    | Show progress indicators (default: true).                                   |
+| `--interactive`, `-i` | Start interactive configuration mode.                                       |
+| `--version`, `-v`     | Show version information.                                                   |
+| `--help`, `-h`        | Show usage information.                                                     |
 
 ## Skipping and Including Structs or Methods
 
@@ -108,7 +108,7 @@ func (s *UserService) GetUser(id int) (*User, error) {
 Running:
 
 ```bash
-ifacegen -match '*Service' ./...
+ifacegen --match '*Service' ./...
 ```
 
 Generates:
@@ -160,6 +160,13 @@ Use `-verbose` for detailed logging:
 ## Output Location
 
 The generated file is written **once per package**, in the same directory as the structs, using the filename from `-output` (default `iface_gen.go`). If the content hasn't changed, the file won't be overwritten.
+
+## Docs
+
+- Development: `docs/development.md`
+- How it works: `docs/how-it-works.md`
+- Releases: `docs/releases.md`
+- Contributing: `CONTRIBUTING.md`
 
 ## License
 
