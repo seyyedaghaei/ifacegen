@@ -15,7 +15,7 @@ It requests enough data to:
 
 Within each package, `ifacegen` scans type declarations to decide which structs should produce interfaces:
 
-- **Name matching** via `-match` (comma-separated globs like `*Service,*Repository`)
+- **Name matching** via `--match` / `-m` (comma-separated globs like `*Service,*Repository`)
 - **Explicit opt-in** via `// ifacegen:generate`
 - **Explicit skip** via `// ifacegen:skip`
 
@@ -53,7 +53,7 @@ If the content is unchanged, it does not rewrite the file.
 
 ### Extra modes
 
-- **Dry-run** (`-dry-run`): computes output and prints a preview without writing files.
-- **Interactive** (`-interactive`): prompts for options and prints an equivalent command.
-- **Watch** (`-watch`): periodically checks for Go file changes and regenerates.
+- **Dry-run** (`--dry-run` / `-d`): computes output and prints a preview without writing files.
+- **Interactive** (`--interactive` / `-i`): prompts for options and prints an equivalent command.
+- **Watch** (`--watch` / `-w`): periodically checks for Go file changes and regenerates.
 

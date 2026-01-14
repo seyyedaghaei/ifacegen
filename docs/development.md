@@ -22,5 +22,18 @@ make ci
 ### Notes
 
 - The CLI entrypoint is `cmd/ifacegen`.
-- `-version` is populated via `-ldflags` in the release workflow.
+- `--version` / `-v` is populated via `-ldflags` in the release workflow.
+
+### Generator tests (golden files)
+
+`internal/generator/generator_golden_test.go` uses small fixture packages under `testdata/`
+and compares the generated `iface_gen.go` output against golden files in:
+
+- `internal/generator/testdata/golden/`
+
+To (re)generate the golden files locally, run:
+
+```bash
+UPDATE_GOLDEN=1 go test ./...
+```
 

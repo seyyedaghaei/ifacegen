@@ -79,7 +79,7 @@ type AuthService struct {
 func (s *UserService) InternalLogic() {}
 ```
 
-You can **explicitly include** structs (even if they don't match `-match`) with the `// ifacegen:generate` comment:
+You can **explicitly include** structs (even if they don't match `--match`) with the `// ifacegen:generate` comment:
 
 ```go
 // ifacegen:generate
@@ -127,19 +127,19 @@ type IUserService interface {
 ## CLI Features
 
 ### Interactive Mode
-The `-interactive` flag starts a guided configuration process:
+The `--interactive` / `-i` flag starts a guided configuration process:
 - Step-by-step setup of all options
 - Preview of generated command
 - Confirmation before execution
 
 ### Dry Run Mode
-Use `-dry-run` to preview what would be generated:
+Use `--dry-run` / `-d` to preview what would be generated:
 - Shows which files would be created/updated
 - Displays file size changes
 - No actual files are written
 
 ### Watch Mode
-Use `-watch` for development workflows:
+Use `--watch` / `-w` for development workflows:
 - Automatically regenerates when files change
 - Polls for changes every 2 seconds
 - Perfect for development environments
@@ -148,10 +148,10 @@ Use `-watch` for development workflows:
 - Real-time progress updates
 - Package-by-package status
 - Success/failure indicators
-- Disable with `-progress=false`
+- Disable with `--progress=false`
 
 ### Verbose Output
-Use `-verbose` for detailed logging:
+Use `--verbose` / `-V` for detailed logging:
 - Package loading information
 - Generation details
 - Error context
@@ -159,7 +159,7 @@ Use `-verbose` for detailed logging:
 
 ## Output Location
 
-The generated file is written **once per package**, in the same directory as the structs, using the filename from `-output` (default `iface_gen.go`). If the content hasn't changed, the file won't be overwritten.
+The generated file is written **once per package**, in the same directory as the structs, using the filename from `--output` (default `iface_gen.go`). If the content hasn't changed, the file won't be overwritten.
 
 ## Docs
 
