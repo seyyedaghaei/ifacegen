@@ -164,6 +164,7 @@ The generated file is written **once per package**, in the same directory as the
 ## Docs
 
 - Development: `docs/development.md`
+- Breaking changes policy: `docs/breaking-changes-policy.md`
 - How it works: `docs/how-it-works.md`
 - Releases: `docs/releases.md`
 - Contributing: `CONTRIBUTING.md`

@@ -15,12 +15,34 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: true
+
+      - name: Update CHANGELOG.md
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Generate/update changelog for this tag.
+          bash scripts/update_changelog.sh "$TAG"
+
+          # If changelog changed, commit and push to main.
+          if ! git diff --quiet -- CHANGELOG.md; then
+            git add CHANGELOG.md
+            git commit -m "docs: update changelog for $TAG" || true
+            git push origin HEAD:main
+          else
+            echo "CHANGELOG.md unchanged; skipping commit."
+          fi
 
       - name: Build binaries (single job)
         env:
