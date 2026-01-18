@@ -17,4 +17,3 @@ type IUserService interface {
 	CreateUser(name string) error
 	GetUser(id int) (*User, error)
 }
-

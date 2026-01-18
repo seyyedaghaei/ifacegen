@@ -9,4 +9,3 @@ import (
 type IAliasService interface {
 	Combine() (shared.Thing, shared2.Thing)
 }
-
