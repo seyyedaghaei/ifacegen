@@ -22,9 +22,6 @@ CHLOG = "CHANGELOG.md"
 def run(cmd: list[str]) -> str:
     return subprocess.check_output(cmd, text=True).strip()
 
-if not subprocess.run(["test", "-f", CHLOG]).returncode:
-    pass
-
 # Ensure CHANGELOG exists with base template.
 try:
     with open(CHLOG, "r", encoding="utf-8") as f:
@@ -70,7 +67,26 @@ idx = tags.index(TAG)
 prev = tags[idx - 1] if idx > 0 else None
 range_expr = f"{prev}..{TAG}" if prev else TAG
 
-subjects = run(["git", "log", range_expr, "--format=%s", "--no-merges"]) if range_expr else ""
+# Build a per-commit record containing:
+# - subject (%s)
+# - body (%b)
+# separated by ASCII delimiters so parsing remains stable even with newlines.
+DELIM_FIELD = "\x1f"
+DELIM_RECORD = "\x1e"
+records_raw = (
+    run(
+        [
+            "git",
+            "log",
+            range_expr,
+            "--no-merges",
+            f"--format=%s{DELIM_FIELD}%b{DELIM_RECORD}",
+        ]
+    )
+    if range_expr
+    else ""
+)
+records = [r for r in records_raw.split(DELIM_RECORD) if r.strip()]
 
 breaking = []
 added = []
@@ -78,23 +94,29 @@ changed = []
 fixed = []
 other = []
 
-markers = re.compile(r"(^BREAKING:|^BREAKING CHANGE:|BREAKING CHANGE|BREAKING)", re.I)
-def cat(msg: str):
-    if not msg:
-        return
-    if markers.search(msg):
-        breaking.append(msg)
-    elif re.match(r"^feat(\(|:| )", msg, re.I):
-        added.append(msg)
-    elif re.match(r"^fix(\(|:| )", msg, re.I):
-        fixed.append(msg)
-    elif re.match(r"^(refactor|docs|ci)(\(|:| )", msg, re.I):
-        changed.append(msg)
-    else:
-        other.append(msg)
+break_marker_re = re.compile(r"(?im)^BREAKING(\s+CHANGE)?\s*:?\s*")
 
-for s in subjects.splitlines():
-    cat(s.strip())
+def cat(subject: str, body: str):
+    subject = subject.strip()
+    body = body.strip()
+    if not subject:
+        return
+    if break_marker_re.search(subject) or break_marker_re.search(body):
+        breaking.append(subject)
+    elif re.match(r"^feat(\(|:| )", subject, re.I):
+        added.append(subject)
+    elif re.match(r"^fix(\(|:| )", subject, re.I):
+        fixed.append(subject)
+    elif re.match(r"^(refactor|docs|ci)(\(|:| )", subject, re.I):
+        changed.append(subject)
+    else:
+        other.append(subject)
+
+for rec in records:
+    parts = rec.split(DELIM_FIELD, 1)
+    subject = parts[0] if parts else ""
+    body = parts[1] if len(parts) == 2 else ""
+    cat(subject, body)
 
 def bullets(items):
     if not items:

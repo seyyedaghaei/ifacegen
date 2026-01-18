@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -39,4 +41,16 @@ jobs:
           # Pin to a release built with Go >= 1.26 (required for go 1.26 modules).
           version: v2.11.3
           args: --timeout=5m
+
+      - name: Check CHANGELOG.md is up to date
+        run: |
+          set -euo pipefail
+          git fetch --tags --force
+          TAG="$(git tag -l 'v*' | sort -V | tail -n 1)"
+          if [[ -z "${TAG}" ]]; then
+            echo "No v* tags found; skipping CHANGELOG check."
+            exit 0
+          fi
+          bash scripts/update_changelog.sh "${TAG}" >/dev/null
+          git diff --exit-code -- CHANGELOG.md
 

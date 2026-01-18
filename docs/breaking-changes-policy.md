@@ -18,12 +18,12 @@ Changes may be considered “breaking” if they affect how users call `ifacegen
 
 ### How to announce breaking changes
 
-When you open a PR (or when you commit), include one of the following in the commit message:
+When you open a PR (or when you commit), include one of the following in the **subject or body** of the commit message:
 
 - `BREAKING: ...`
 - `BREAKING CHANGE: ...`
 
-The release workflow will detect these markers and include them under **Breaking Changes** in `CHANGELOG.md`.
+The changelog script (and CI check against `CHANGELOG.md`) detect these markers and list the commit under **Breaking Changes** in `CHANGELOG.md`, using the subject line as the bullet text.
 
 ### When to bump versions
 
