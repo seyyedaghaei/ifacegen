@@ -171,4 +171,4 @@ The generated file is written **once per package**, in the same directory as the
 
 ## License
 
-MIT © Morteza SeyyedAgahei
+MIT. See [LICENSE](LICENSE).
